@@ -1,0 +1,816 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>NOCT.PILIH</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: kontak sheet malam hari. Header lengket, hero judul galeri, grid masonry foto,
+   tombol Pilih jelas di tiap foto, dock bawah untuk klien, panel live untuk fotografer. */
+:root {
+  --bg: #0B0D12;
+  --surface: #141822;
+  --surface2: #1C2130;
+  --line: #2B3140;
+  --fg: #EEEBE3;
+  --muted: #9097A8;
+  --accent: #F4B740;
+  --accent-text: #F4B740;
+  --accent-ink: #1B1403;
+  --ok: #5ED3A2;
+  --warn: #FF9B6B;
+  --scrim: rgba(8, 10, 14, .92);
+  --overlay: rgba(10, 12, 16, .66);
+  --overlay-fg: #FFFFFF;
+  --f-display: 'Bricolage Grotesque', 'Inter', system-ui, sans-serif;
+  --f-body: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --f-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  --r: 16px;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #F2F1EC; --surface: #FFFFFF; --surface2: #E8E6DF; --line: #D6D3CA;
+    --fg: #14161C; --muted: #626877; --accent: #F0A81C; --accent-text: #8A5600;
+    --accent-ink: #1B1403; --ok: #0E7F58; --warn: #B4471A; --scrim: rgba(242, 241, 236, .94);
+    color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --bg: #F2F1EC; --surface: #FFFFFF; --surface2: #E8E6DF; --line: #D6D3CA;
+  --fg: #14161C; --muted: #626877; --accent: #F0A81C; --accent-text: #8A5600;
+  --accent-ink: #1B1403; --ok: #0E7F58; --warn: #B4471A; --scrim: rgba(242, 241, 236, .94);
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg);
+  font-family: var(--f-body); font-size: 15px; line-height: 1.5;
+}
+body::before {
+  content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px);
+  z-index: 40; background: var(--bg);
+}
+button { font: inherit; color: inherit; }
+img { display: block; }
+:focus-visible { outline: 2px solid var(--accent-text); outline-offset: 2px; }
+
+.wrap {
+  max-width: 1280px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* header */
+.top {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 30;
+  background: var(--bg); border-bottom: 1px solid var(--line);
+}
+.top-in { display: flex; align-items: center; gap: 12px; padding-block: 12px; flex-wrap: wrap; min-width: 0; }
+.logo {
+  font-family: var(--f-display); font-weight: 800; font-size: 21px; letter-spacing: .01em;
+  color: var(--fg); text-decoration: none; margin-right: auto; white-space: nowrap;
+}
+.logo span { color: var(--accent-text); }
+.chip {
+  display: inline-flex; align-items: center; gap: 8px; height: 34px; padding: 0 14px;
+  border-radius: 999px; border: 1px solid var(--line); background: var(--surface);
+  font-family: var(--f-mono); font-size: 12px; letter-spacing: .04em; text-transform: uppercase; white-space: nowrap;
+}
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); flex: none; }
+.chip.on .dot { background: var(--ok); box-shadow: 0 0 0 0 var(--ok); animation: pulse 2s infinite; }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--ok) 60%, transparent); } 70%, 100% { box-shadow: 0 0 0 8px transparent; } }
+@media (prefers-reduced-motion: reduce) { .chip.on .dot { animation: none; } * { scroll-behavior: auto !important; } }
+
+/* buttons */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 44px; padding: 0 20px; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--line); background: var(--surface2); font-weight: 600; font-size: 14px;
+  white-space: nowrap; text-decoration: none;
+}
+.btn:hover { border-color: var(--muted); }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: transparent; }
+.btn.primary:hover { filter: brightness(1.06); }
+.btn.big { min-height: 52px; padding: 0 28px; font-size: 16px; }
+.btn.sm { min-height: 36px; padding: 0 14px; font-size: 13px; }
+.btn.icon { width: 44px; padding: 0; }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+
+/* main */
+main { padding-block: 24px 40px; display: grid; gap: 20px; }
+body.has-dock main { padding-bottom: 130px; }
+
+.banner { padding: 12px 16px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); font-size: 14px; display: flex; gap: 10px; align-items: flex-start; }
+.banner b { font-weight: 600; }
+.banner.warn { border-color: color-mix(in srgb, var(--warn) 55%, var(--line)); }
+.banner.ok { border-color: color-mix(in srgb, var(--ok) 55%, var(--line)); }
+.banner .ic { flex: none; font-family: var(--f-mono); font-weight: 500; }
+.banner.warn .ic { color: var(--warn); }
+.banner.ok .ic { color: var(--ok); }
+.banner.info .ic { color: var(--accent-text); }
+
+.hero { display: grid; gap: 8px; }
+.eyebrow { font-family: var(--f-mono); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent-text); }
+h1 {
+  font-family: var(--f-display); font-weight: 800; letter-spacing: -.02em; line-height: 1.02;
+  font-size: clamp(32px, 6vw, 60px); margin: 0; text-wrap: balance; overflow-wrap: anywhere;
+}
+.sub { color: var(--muted); max-width: 56ch; margin: 0; }
+
+/* studio panel */
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 18px; display: grid; gap: 18px; }
+.fields { display: grid; grid-template-columns: 2fr 1.5fr .8fr; gap: 12px; }
+.field { display: grid; gap: 6px; min-width: 0; }
+.field label { font-family: var(--f-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.field input {
+  height: 44px; padding: 0 14px; border-radius: 12px; border: 1px solid var(--line);
+  background: var(--bg); color: var(--fg); font: inherit; width: 100%; min-width: 0;
+}
+.field input::placeholder { color: var(--muted); }
+.row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.row .grow { flex: 1 1 220px; min-width: 0; }
+.stat { font-family: var(--f-display); font-weight: 700; font-size: 22px; font-variant-numeric: tabular-nums; }
+.stat small { font-family: var(--f-body); font-weight: 400; font-size: 14px; color: var(--muted); margin-left: 6px; }
+.pill { display: inline-flex; align-items: center; height: 28px; padding: 0 12px; border-radius: 999px; font-size: 12px; font-weight: 600; border: 1px solid var(--line); }
+.pill.final { background: var(--ok); color: #04150E; border-color: transparent; }
+.muted { color: var(--muted); font-size: 13px; }
+.note { padding: 10px 14px; border-radius: 12px; background: var(--bg); border: 1px dashed var(--line); font-size: 14px; overflow-wrap: anywhere; }
+details.help { border-top: 1px solid var(--line); padding-top: 14px; font-size: 14px; }
+details.help summary { cursor: pointer; font-weight: 600; }
+details.help ol { margin: 10px 0 8px; padding-left: 20px; display: grid; gap: 4px; }
+details.help p { margin: 0; color: var(--muted); }
+.progress { font-size: 13px; color: var(--accent-text); font-family: var(--f-mono); }
+
+/* tabs */
+.tabs { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.tab {
+  min-height: 40px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line);
+  background: transparent; cursor: pointer; font-weight: 600; font-size: 14px;
+}
+.tab[aria-pressed="true"] { background: var(--fg); color: var(--bg); border-color: transparent; }
+.tab span { font-family: var(--f-mono); font-weight: 400; margin-left: 6px; opacity: .75; }
+
+/* grid */
+.grid { columns: 2; column-gap: 12px; }
+@media (min-width: 760px) { .grid { columns: 3; column-gap: 16px; } }
+@media (min-width: 1100px) { .grid { columns: 4; } }
+.card { margin: 0 0 16px; break-inside: avoid; display: block; }
+.frame { position: relative; border-radius: 14px; overflow: hidden; background: var(--surface2); }
+.ph { display: block; width: 100%; padding: 0; border: 0; background: var(--surface2); cursor: zoom-in; position: relative; }
+.ph img { width: 100%; height: 100%; object-fit: cover; }
+.card.on .ph::after { content: ""; position: absolute; inset: 0; border: 3px solid var(--accent); border-radius: 14px; pointer-events: none; }
+.pick {
+  position: absolute; right: 10px; bottom: 10px; height: 42px; padding: 0 16px 0 10px;
+  display: inline-flex; align-items: center; gap: 8px; border-radius: 999px; cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, .3); background: var(--overlay); color: var(--overlay-fg);
+  font-weight: 600; font-size: 14px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+}
+.pick .ck { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid currentColor; display: grid; place-items: center; }
+.pick .ck svg { opacity: 0; }
+.card.on .pick { background: var(--accent); color: var(--accent-ink); border-color: transparent; }
+.card.on .pick .ck { background: var(--accent-ink); color: var(--accent); border-color: transparent; }
+.card.on .pick .ck svg { opacity: 1; }
+.pick:disabled { cursor: default; }
+.del {
+  position: absolute; left: 10px; top: 10px; height: 32px; padding: 0 12px; border-radius: 999px; cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, .3); background: var(--overlay); color: var(--overlay-fg); font-size: 12px; font-weight: 600;
+}
+.del.arm { background: #D64545; border-color: transparent; }
+figcaption { display: flex; justify-content: space-between; gap: 8px; padding: 8px 4px 0; font-family: var(--f-mono); font-size: 12px; color: var(--muted); min-width: 0; }
+figcaption .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+
+.empty {
+  border: 1.5px dashed var(--line); border-radius: var(--r); padding: 44px 20px; text-align: center;
+  display: grid; gap: 14px; justify-items: center;
+}
+.empty h2 { font-family: var(--f-display); font-size: 24px; margin: 0; }
+.empty p { margin: 0; color: var(--muted); max-width: 46ch; }
+.empty.drag { border-color: var(--accent); }
+
+/* dock */
+.dock {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 25; background: var(--scrim);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid var(--line);
+  padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px)); padding-top: 12px;
+}
+.dock-in { display: flex; align-items: center; gap: 12px; justify-content: space-between; flex-wrap: wrap; }
+.cnt { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
+.cnt b { font-family: var(--f-display); font-size: 36px; line-height: 1; font-weight: 800; font-variant-numeric: tabular-nums; }
+.cnt span { color: var(--muted); font-size: 14px; }
+.acts { display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* toasts */
+.toasts { position: fixed; z-index: 60; top: calc(env(safe-area-inset-top, 0px) + 68px); right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 8px; justify-items: end; pointer-events: none; }
+.toast {
+  max-width: min(340px, calc(100vw - 32px)); padding: 12px 16px; border-radius: 12px; font-size: 14px; font-weight: 500;
+  background: var(--fg); color: var(--bg); box-shadow: 0 8px 24px rgba(0, 0, 0, .25); transition: opacity .3s, transform .3s;
+}
+.toast.ok { background: var(--accent); color: var(--accent-ink); }
+.toast.warn { background: var(--warn); color: #170701; }
+.toast.out { opacity: 0; transform: translateY(-6px); }
+
+/* lightbox */
+.lb { position: fixed; inset: 0; z-index: 50; background: var(--scrim); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: grid; grid-template-rows: auto 1fr auto; }
+.lb-top, .lb-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.lb-top { padding-top: calc(12px + env(safe-area-inset-top, 0px)); padding-bottom: 12px; font-family: var(--f-mono); font-size: 13px; }
+.lb-top .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.lb-bar { padding-top: 12px; padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px)); justify-content: center; }
+.lb-stage { min-height: 0; display: grid; place-items: center; padding: 0 12px; }
+.lb-stage img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 10px; }
+
+/* sheet */
+.sheet-wrap { position: fixed; inset: 0; z-index: 70; background: rgba(0, 0, 0, .55); display: grid; place-items: end center; padding: 16px; }
+@media (min-width: 640px) { .sheet-wrap { place-items: center; } }
+.sheet { width: min(480px, 100%); background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 22px; display: grid; gap: 14px; max-height: 90vh; overflow: auto; }
+.sheet h2 { font-family: var(--f-display); font-size: 24px; margin: 0; line-height: 1.15; }
+.sheet p { margin: 0; color: var(--muted); }
+.sheet textarea { width: 100%; min-height: 96px; resize: vertical; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); font: inherit; }
+.sheet-actions { display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
+
+@media (max-width: 700px) {
+  .fields { grid-template-columns: 1fr; }
+  .btn.label-hide .t { display: none; }
+  .cnt b { font-size: 30px; }
+  .acts { flex: 1 1 100%; }
+  .acts .btn { flex: 1; }
+}
+</style>
+
+<header class="top">
+  <div class="wrap top-in">
+    <a class="logo" href="#" aria-label="NOCT.PILIH">NOCT<span>.</span>PILIH</a>
+    <span class="chip" id="chip"><i class="dot"></i><span id="chipTxt">Menyambung</span></span>
+    <button class="btn sm" id="viewToggle" type="button" hidden>Lihat sebagai klien</button>
+    <button class="btn sm icon" id="themeBtn" type="button" aria-label="Ganti tema terang atau gelap">
+      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg>
+    </button>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="banner" id="banner" hidden></div>
+
+  <section class="hero">
+    <div class="eyebrow" id="eyebrow">Galeri pilihan</div>
+    <h1 id="gTitle">Galeri Foto</h1>
+    <p class="sub" id="gSub"></p>
+  </section>
+
+  <section class="panel" id="panel" hidden aria-label="Panel fotografer">
+    <div class="fields">
+      <div class="field"><label for="fTitle">Judul galeri</label><input id="fTitle" type="text" maxlength="80" placeholder="Contoh: Prewedding Rani &amp; Dimas"></div>
+      <div class="field"><label for="fClient">Nama klien</label><input id="fClient" type="text" maxlength="60" placeholder="Contoh: Rani"></div>
+      <div class="field"><label for="fLimit">Batas pilihan</label><input id="fLimit" type="number" min="0" max="999" inputmode="numeric" placeholder="0 = bebas"></div>
+    </div>
+    <div class="row">
+      <label class="btn primary" for="fileIn">+ Tambah foto</label>
+      <input class="sr" id="fileIn" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple>
+      <button class="btn" id="stCopy" type="button">Salin daftar file</button>
+      <button class="btn" id="stReopen" type="button" hidden>Buka pilihan lagi</button>
+      <span class="progress" id="progress" aria-live="polite"></span>
+      <span class="muted" id="saved"></span>
+    </div>
+    <div class="row">
+      <div class="stat" id="stCount">0<small>dipilih</small></div>
+      <span class="pill" id="stPill">Terbuka</span>
+      <span class="muted grow" id="stLive">Menunggu pilihan klien</span>
+    </div>
+    <div class="note" id="stNote" hidden></div>
+    <details class="help">
+      <summary>Cara membagikan ke klien</summary>
+      <ol>
+        <li>Tambah foto lewat tombol di atas. Foto dikecilkan otomatis ke 2000 px.</li>
+        <li>Buka menu Bagikan di halaman ini, lalu beri klien akses Contributor.</li>
+        <li>Kirim linknya. Setiap foto yang klien pilih langsung muncul di halaman ini.</li>
+      </ol>
+      <p>Klien dengan akses Viewer hanya bisa melihat. Mereka masih bisa memilih, menyalin daftarnya, dan mengirimnya lewat chat.</p>
+    </details>
+  </section>
+
+  <section class="tabs" id="tabs" aria-label="Filter foto">
+    <button class="tab" type="button" data-tab="all" aria-pressed="true">Semua<span id="nAll">0</span></button>
+    <button class="tab" type="button" data-tab="picked" aria-pressed="false">Dipilih<span id="nPick">0</span></button>
+  </section>
+
+  <section class="grid" id="grid" aria-label="Daftar foto"></section>
+  <section class="empty" id="empty" hidden></section>
+</main>
+
+<footer class="dock" id="dock" hidden>
+  <div class="wrap dock-in">
+    <div class="cnt"><b id="dkNum">0</b><span id="dkOf">dipilih</span></div>
+    <div class="acts">
+      <button class="btn" id="dkCopy" type="button">Salin daftar</button>
+      <button class="btn primary big" id="dkSend" type="button">Kirim Pilihan</button>
+    </div>
+  </div>
+</footer>
+
+<div class="lb" id="lb" hidden role="dialog" aria-modal="true" aria-label="Pratinjau foto">
+  <div class="lb-top"><span class="nm" id="lbName"></span><span id="lbCount"></span><button class="btn sm" id="lbClose" type="button">Tutup</button></div>
+  <div class="lb-stage" id="lbStage"><img id="lbImg" alt=""></div>
+  <div class="lb-bar">
+    <button class="btn icon" id="lbPrev" type="button" aria-label="Foto sebelumnya">&larr;</button>
+    <button class="btn primary big" id="lbPick" type="button">Pilih foto</button>
+    <button class="btn icon" id="lbNext" type="button" aria-label="Foto berikutnya">&rarr;</button>
+  </div>
+</div>
+
+<div class="sheet-wrap" id="sheet" hidden><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="shTitle"><h2 id="shTitle"></h2><div id="shBody"></div><div class="sheet-actions" id="shActs"></div></div></div>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script>
+(function () {
+  var $ = function (s) { return document.querySelector(s); };
+  var CHECK = '<svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M4 10.5l4 4 8-9" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+  var S = {
+    photos: [], picks: new Map(), local: new Set(),
+    meta: { title: '', client: '', limit: 0 }, status: { state: 'open', note: '', at: 0 },
+    tab: 'all', preview: false, canEdit: false, canWrite: true,
+    connected: false, loadErr: false, noDb: false, lastEvent: null, lb: -1, upload: null
+  };
+  var db = null, assetsApi = null, user = null;
+
+  function studio() { return S.canEdit && !S.preview; }
+  function liveWrite() { return !!db && S.canWrite && !S.preview; }
+  function isPicked(id) { return (studio() || liveWrite()) ? S.picks.get(id) === true : S.local.has(id); }
+  function pickedList() { return S.photos.filter(function (p) { return isPicked(p.id); }); }
+  function locked() { return !studio() && S.status.state === 'final'; }
+  function pad(n) { return String(n).padStart(3, '0'); }
+  function setText(el, t) { if (el.textContent !== t) el.textContent = t; }
+
+  function ago(ts) {
+    if (!ts) return '';
+    var s = Math.max(0, Math.round((Date.now() - ts) / 1000));
+    if (s < 10) return 'barusan';
+    if (s < 60) return s + ' dtk lalu';
+    if (s < 3600) return Math.round(s / 60) + ' mnt lalu';
+    if (s < 86400) return Math.round(s / 3600) + ' jam lalu';
+    return Math.round(s / 86400) + ' hari lalu';
+  }
+
+  function toast(msg, kind) {
+    var box = $('#toasts');
+    while (box.children.length >= 4) box.firstChild.remove();
+    var t = document.createElement('div');
+    t.className = 'toast ' + (kind || '');
+    t.textContent = msg;
+    box.append(t);
+    setTimeout(function () { t.classList.add('out'); setTimeout(function () { t.remove(); }, 320); }, 3600);
+  }
+
+  function note(text) {
+    S.lastEvent = { text: text, at: Date.now() };
+    toast(text, 'ok');
+  }
+
+  /* ---------- sheet ---------- */
+  function openSheet(o) {
+    $('#shTitle').textContent = o.title;
+    var body = $('#shBody'); body.textContent = '';
+    if (o.build) o.build(body);
+    var acts = $('#shActs'); acts.textContent = '';
+    o.actions.forEach(function (a) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'btn' + (a.primary ? ' primary' : '');
+      b.textContent = a.label;
+      b.onclick = function () { if (a.close !== false) closeSheet(); if (a.fn) a.fn(); };
+      acts.append(b);
+    });
+    $('#sheet').hidden = false;
+    var f = acts.querySelector('.primary') || acts.querySelector('button');
+    if (f) f.focus();
+  }
+  function closeSheet() { $('#sheet').hidden = true; }
+
+  function listText() {
+    var names = pickedList().map(function (p) { return p.name; });
+    var head = (S.meta.client ? 'Pilihan ' + S.meta.client : 'Pilihan foto') + ' (' + names.length + ' foto)';
+    return head + '\n' + names.join('\n');
+  }
+  function copyList() {
+    if (!pickedList().length) { toast('Belum ada foto yang dipilih.', 'warn'); return; }
+    var text = listText();
+    var fallback = function () {
+      openSheet({
+        title: 'Salin daftar ini',
+        build: function (b) {
+          var p = document.createElement('p'); p.textContent = 'Browser tidak mengizinkan salin otomatis. Blok semua teks di bawah, lalu salin.';
+          var ta = document.createElement('textarea'); ta.readOnly = true; ta.value = text; ta.style.marginTop = '10px';
+          b.append(p, ta); setTimeout(function () { ta.focus(); ta.select(); }, 30);
+        },
+        actions: [{ label: 'Selesai', primary: true }]
+      });
+    };
+    try {
+      navigator.clipboard.writeText(text).then(function () { toast('Daftar pilihan tersalin', 'ok'); }, fallback);
+    } catch (e) { fallback(); }
+  }
+
+  /* ---------- picking ---------- */
+  var chain = new Map();
+  function togglePick(id) {
+    if (studio()) return;
+    if (locked()) { toast('Pilihan sudah dikirim dan dikunci.', 'warn'); return; }
+    var on = !isPicked(id);
+    if (on && S.meta.limit > 0 && pickedList().length >= S.meta.limit) {
+      toast('Batas ' + S.meta.limit + ' foto sudah tercapai. Batalkan satu foto dulu.', 'warn'); return;
+    }
+    if (!liveWrite()) {
+      if (on) S.local.add(id); else S.local.delete(id);
+      render(); return;
+    }
+    var ref = db.doc('picks/' + id);
+    var prev = chain.get(id) || Promise.resolve();
+    var next = prev.then(function () { return ref.set({ picked: on, at: Date.now() }); }).catch(function (e) {
+      if (e && e.code === 'invalid_argument') {
+        S.canWrite = false;
+        if (on) S.local.add(id);
+        S.picks.forEach(function (v, k) { if (v) S.local.add(k); });
+        toast('Akses kamu hanya untuk melihat. Pilihan belum terkirim.', 'warn');
+        render();
+      } else { toast('Pilihan gagal disimpan. Coba lagi.', 'warn'); }
+    });
+    chain.set(id, next);
+  }
+
+  function confirmFinal() {
+    var n = pickedList().length;
+    if (!n) { toast('Pilih minimal satu foto dulu.', 'warn'); return; }
+    var ta;
+    openSheet({
+      title: 'Kirim ' + n + ' foto pilihanmu?',
+      build: function (b) {
+        var p = document.createElement('p'); p.textContent = 'Setelah dikirim, pilihan dikunci. Fotografer akan melihatnya seketika.';
+        ta = document.createElement('textarea'); ta.id = 'finalNote'; ta.placeholder = 'Catatan untuk fotografer (opsional)'; ta.style.marginTop = '12px'; ta.maxLength = 600;
+        b.append(p, ta);
+      },
+      actions: [
+        { label: 'Kembali' },
+        { label: 'Kirim sekarang', primary: true, fn: function () {
+          db.doc('meta/status').set({ state: 'final', note: ta ? ta.value.trim() : '', at: Date.now() })
+            .then(function () { toast('Pilihan terkirim. Terima kasih!', 'ok'); })
+            .catch(function () { toast('Gagal mengirim. Coba lagi.', 'warn'); });
+        } }
+      ]
+    });
+  }
+
+  /* ---------- upload (fotografer) ---------- */
+  function shrink(file) {
+    return createImageBitmap(file).then(function (bmp) {
+      var max = 2000, s = Math.min(1, max / Math.max(bmp.width, bmp.height));
+      var w = Math.round(bmp.width * s), h = Math.round(bmp.height * s);
+      var out = { blob: file, w: bmp.width, h: bmp.height };
+      if (file.type === 'image/gif') { if (bmp.close) bmp.close(); return out; }
+      var c = document.createElement('canvas'); c.width = w; c.height = h;
+      c.getContext('2d').drawImage(bmp, 0, 0, w, h);
+      if (bmp.close) bmp.close();
+      return new Promise(function (res) {
+        c.toBlob(function (b) { res(b && b.size < file.size ? { blob: b, w: w, h: h } : out); }, 'image/jpeg', 0.88);
+      });
+    }).catch(function () { return { blob: file, w: 0, h: 0 }; });
+  }
+
+  async function addFiles(files) {
+    if (!assetsApi || !db) { toast('Unggah foto hanya bisa dilakukan pemilik galeri.', 'warn'); return; }
+    var all = Array.prototype.slice.call(files);
+    var list = all.filter(function (f) { return /^image\/(jpeg|png|webp|gif)$/.test(f.type); });
+    if (!list.length) { toast('Pilih file JPG, PNG, atau WebP.', 'warn'); return; }
+    list.sort(function (a, b) { return a.name.localeCompare(b.name, undefined, { numeric: true }); });
+    var maxOrder = S.photos.reduce(function (m, p) { return Math.max(m, p.order || 0); }, 0);
+    var base = Math.max(Date.now(), maxOrder + 1), fail = 0;
+    for (var i = 0; i < list.length; i++) {
+      S.upload = { i: i + 1, n: list.length }; renderUpload();
+      var f = list[i];
+      try {
+        var s = await shrink(f);
+        var up = await assetsApi.upload(s.blob, { type: s.blob.type || f.type });
+        await db.collection('photos').doc().set({ asset: up.id, name: f.name.replace(/\.[^.]+$/, ''), w: s.w, h: s.h, order: base + i });
+      } catch (e) { fail++; }
+    }
+    S.upload = null; renderUpload();
+    var ok = list.length - fail;
+    if (ok) toast(ok + ' foto ditambahkan' + (fail ? ', ' + fail + ' gagal' : ''), fail ? 'warn' : 'ok');
+    else toast('Foto gagal diunggah. Coba lagi.', 'warn');
+    if (all.length > list.length) toast((all.length - list.length) + ' file dilewati karena bukan JPG, PNG, atau WebP.', 'warn');
+  }
+
+  async function removePhoto(id) {
+    var p = S.photos.find(function (x) { return x.id === id; });
+    try {
+      await db.doc('photos/' + id).delete();
+      await db.doc('picks/' + id).delete();
+      if (assetsApi && p && p.asset) await assetsApi.delete(p.asset);
+    } catch (e) { toast('Foto gagal dihapus.', 'warn'); }
+  }
+
+  /* ---------- render ---------- */
+  var cards = new Map();
+
+  function makeCard(p) {
+    var f = document.createElement('figure');
+    f.className = 'card'; f.dataset.id = p.id;
+    f.innerHTML = '<div class="frame"><button type="button" class="ph" data-act="open" aria-label="Perbesar foto"><img alt="" loading="lazy" decoding="async"></button>' +
+      '<button type="button" class="pick" data-act="pick"><span class="ck">' + CHECK + '</span><span class="pl">Pilih</span></button>' +
+      '<button type="button" class="del" data-act="del">Hapus</button></div><figcaption><span class="nm"></span><span class="ix"></span></figcaption>';
+    return f;
+  }
+
+  function updateCard(el, p, idx) {
+    var on = isPicked(p.id);
+    el.classList.toggle('on', on);
+    var ph = el.querySelector('.ph');
+    ph.style.aspectRatio = (p.w && p.h) ? (p.w + ' / ' + p.h) : '4 / 5';
+    var img = ph.querySelector('img'), src = '/_blob/' + p.asset;
+    if (img.getAttribute('src') !== src) { img.setAttribute('src', src); img.alt = p.name; }
+    setText(el.querySelector('.nm'), p.name);
+    setText(el.querySelector('.ix'), '#' + pad(idx + 1));
+    var pk = el.querySelector('.pick');
+    pk.hidden = studio() && !on;
+    pk.disabled = studio() || locked();
+    pk.setAttribute('aria-pressed', String(on));
+    pk.setAttribute('aria-label', on ? 'Batalkan pilihan ' + p.name : 'Pilih ' + p.name);
+    setText(pk.querySelector('.pl'), on ? 'Dipilih' : 'Pilih');
+    el.querySelector('.del').hidden = !studio();
+  }
+
+  function currentList() { return S.tab === 'picked' ? pickedList() : S.photos; }
+
+  function renderGrid() {
+    var grid = $('#grid'), list = currentList(), seen = new Set(), prev = null;
+    list.forEach(function (p) {
+      var el = cards.get(p.id);
+      if (!el) { el = makeCard(p); cards.set(p.id, el); }
+      updateCard(el, p, S.photos.indexOf(p));
+      var ref = prev ? prev.nextSibling : grid.firstChild;
+      if (el !== ref) grid.insertBefore(el, ref);
+      prev = el; seen.add(p.id);
+    });
+    cards.forEach(function (el, id) { if (!seen.has(id)) { el.remove(); cards.delete(id); } });
+  }
+
+  function renderEmpty() {
+    var box = $('#empty'), list = currentList();
+    if (list.length) { box.hidden = true; return; }
+    box.hidden = false; box.textContent = '';
+    var h = document.createElement('h2'), p = document.createElement('p');
+    if (S.noDb) {
+      h.textContent = 'Galeri belum bisa dibuka'; p.textContent = 'Buka link ini dengan akun yang sudah masuk. Foto akan tampil otomatis.';
+      box.append(h, p);
+    } else if (S.photos.length === 0) {
+      if (studio()) {
+        h.textContent = 'Belum ada foto'; p.textContent = 'Seret foto ke sini atau tekan tombol di bawah. Foto dikecilkan otomatis supaya cepat dibuka klien.';
+        var lab = document.createElement('label'); lab.className = 'btn primary big'; lab.htmlFor = 'fileIn'; lab.textContent = '+ Tambah foto';
+        box.append(h, p, lab);
+      } else {
+        h.textContent = 'Galeri sedang disiapkan'; p.textContent = 'Belum ada foto di sini. Halaman ini akan terisi sendiri begitu fotografer selesai mengunggah.';
+        box.append(h, p);
+      }
+    } else {
+      h.textContent = 'Belum ada foto dipilih'; p.textContent = 'Foto yang dipilih akan tampil di tab ini.';
+      box.append(h, p);
+    }
+  }
+
+  function renderBanner() {
+    var b = $('#banner'), kind = '', icon = '', html = '';
+    if (S.noDb) { kind = 'info'; icon = 'i'; html = '<span>Galeri ini memakai penyimpanan real time. Buka lewat link yang dibagikan fotografer dengan akun yang sudah masuk.</span>'; }
+    else if (S.loadErr) { kind = 'warn'; icon = '!'; html = '<span>Belum bisa terhubung ke galeri. Cek koneksi internet. Data akan muncul sendiri begitu tersambung.</span>'; }
+    else if (S.canEdit && S.preview) { kind = 'info'; icon = 'i'; html = '<span><b>Mode pratinjau klien.</b> Pilihan di sini tidak disimpan dan tidak terlihat di panel live.</span>'; }
+    else if (!studio() && db && !liveWrite()) { kind = 'warn'; icon = '!'; html = '<span><b>Akses kamu hanya untuk melihat.</b> Pilihanmu belum terkirim ke fotografer. Pilih foto, lalu tekan Salin Daftar Pilihan dan kirim lewat chat.</span>'; }
+    else if (!studio() && S.status.state === 'final') { kind = 'ok'; icon = '✓'; html = '<span><b>Pilihan sudah terkirim.</b> Fotografer sudah menerima ' + pickedList().length + ' foto pilihanmu.</span>'; }
+    if (!kind) { b.hidden = true; return; }
+    b.hidden = false; b.className = 'banner ' + kind;
+    b.innerHTML = '<span class="ic">' + icon + '</span>' + html;
+  }
+
+  function renderTop() {
+    var chip = $('#chip'), txt = $('#chipTxt'), n = pickedList().length;
+    var on = false, t = '';
+    if (S.noDb) t = 'Offline';
+    else if (S.loadErr) t = 'Menyambung';
+    else if (studio()) { on = S.connected; t = (S.connected ? 'Live · ' : 'Menyambung · ') + n + '/' + S.photos.length + ' dipilih'; }
+    else if (liveWrite()) { on = S.connected; t = S.connected ? 'Tersambung ke fotografer' : 'Menyambung'; }
+    else { t = 'Mode salin manual'; }
+    chip.classList.toggle('on', on);
+    setText(txt, t);
+    var vt = $('#viewToggle');
+    vt.hidden = !S.canEdit;
+    setText(vt, S.preview ? 'Kembali ke studio' : 'Lihat sebagai klien');
+  }
+
+  function renderHero() {
+    setText($('#eyebrow'), studio() ? 'Studio · ' + (S.meta.client ? 'untuk ' + S.meta.client : 'galeri klien') : (S.meta.client ? 'Galeri untuk ' + S.meta.client : 'Galeri pilihan'));
+    setText($('#gTitle'), S.meta.title || 'Galeri Foto');
+    var sub;
+    if (studio()) sub = 'Pilihan klien muncul di sini seketika. Foto yang dipilih diberi bingkai kuning.';
+    else if (locked()) sub = 'Pilihanmu sudah dikunci. Hubungi fotografer jika ingin mengubahnya.';
+    else sub = 'Ketuk Pilih di foto favoritmu.' + (S.meta.limit ? ' Kamu bisa memilih sampai ' + S.meta.limit + ' foto.' : '') + (liveWrite() ? ' Fotografer langsung melihat pilihanmu.' : '');
+    setText($('#gSub'), sub);
+  }
+
+  function setVal(i, v) { if (document.activeElement !== i && i.value !== String(v)) i.value = v; }
+
+  function renderPanel() {
+    var p = $('#panel'); p.hidden = !studio();
+    if (!studio()) return;
+    setVal($('#fTitle'), S.meta.title); setVal($('#fClient'), S.meta.client); setVal($('#fLimit'), S.meta.limit || '');
+    var n = pickedList().length;
+    $('#stCount').innerHTML = n + '<small>dari ' + S.photos.length + ' foto dipilih</small>';
+    var fin = S.status.state === 'final';
+    var pill = $('#stPill'); setText(pill, fin ? 'Final dikirim ' + ago(S.status.at) : 'Klien masih memilih'); pill.classList.toggle('final', fin);
+    $('#stReopen').hidden = !fin;
+    var nt = $('#stNote'); nt.hidden = !(fin && S.status.note); if (!nt.hidden) setText(nt, 'Catatan klien: ' + S.status.note);
+    renderLiveText();
+  }
+  function renderLiveText() {
+    var el = $('#stLive'); if (!el) return;
+    setText(el, S.lastEvent ? S.lastEvent.text + ' · ' + ago(S.lastEvent.at) : 'Menunggu pilihan klien');
+  }
+  function renderUpload() {
+    var el = $('#progress');
+    setText(el, S.upload ? 'Mengunggah ' + S.upload.i + ' dari ' + S.upload.n + '…' : '');
+    $('#fileIn').disabled = !!S.upload;
+  }
+
+  function renderTabs() {
+    setText($('#nAll'), String(S.photos.length)); setText($('#nPick'), String(pickedList().length));
+    document.querySelectorAll('.tab').forEach(function (t) { t.setAttribute('aria-pressed', String(t.dataset.tab === S.tab)); });
+    $('#tabs').hidden = S.photos.length === 0;
+  }
+
+  function renderDock() {
+    var show = !studio() && S.photos.length > 0, d = $('#dock');
+    d.hidden = !show; document.body.classList.toggle('has-dock', show);
+    if (!show) return;
+    var n = pickedList().length, fin = S.status.state === 'final';
+    setText($('#dkNum'), String(n));
+    setText($('#dkOf'), S.meta.limit ? 'dari ' + S.meta.limit + ' pilihan' : 'dari ' + S.photos.length + ' foto');
+    var send = $('#dkSend'), copy = $('#dkCopy');
+    if (liveWrite()) {
+      copy.hidden = false; send.hidden = fin;
+      setText(send, 'Kirim Pilihan');
+    } else {
+      copy.hidden = true; send.hidden = false; setText(send, 'Salin Daftar Pilihan');
+    }
+    send.disabled = n === 0;
+  }
+
+  function renderLb() {
+    var lb = $('#lb');
+    if (S.lb < 0) { lb.hidden = true; return; }
+    var list = currentList();
+    if (!list.length) { S.lb = -1; lb.hidden = true; return; }
+    if (S.lb >= list.length) S.lb = list.length - 1;
+    var p = list[S.lb]; lb.hidden = false;
+    var img = $('#lbImg'), src = '/_blob/' + p.asset;
+    if (img.getAttribute('src') !== src) { img.setAttribute('src', src); img.alt = p.name; }
+    setText($('#lbName'), p.name); setText($('#lbCount'), (S.lb + 1) + ' / ' + list.length);
+    var on = isPicked(p.id), b = $('#lbPick');
+    b.hidden = studio() && !on;
+    b.disabled = studio() || locked();
+    setText(b, studio() ? 'Dipilih klien ✓' : (on ? 'Dipilih ✓ (ketuk untuk batal)' : 'Pilih foto'));
+    b.classList.toggle('primary', !on || studio());
+  }
+
+  function render() {
+    renderTop(); renderBanner(); renderHero(); renderPanel(); renderTabs(); renderGrid(); renderEmpty(); renderDock(); renderLb();
+  }
+
+  /* ---------- events ---------- */
+  $('#grid').addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-act]'); if (!b) return;
+    var card = b.closest('.card'), id = card.dataset.id, act = b.dataset.act;
+    if (act === 'pick') togglePick(id);
+    else if (act === 'open') { S.lb = currentList().findIndex(function (p) { return p.id === id; }); renderLb(); }
+    else if (act === 'del') {
+      if (b.classList.contains('arm')) { b.classList.remove('arm'); removePhoto(id); }
+      else { b.classList.add('arm'); b.textContent = 'Yakin hapus?'; setTimeout(function () { b.classList.remove('arm'); b.textContent = 'Hapus'; }, 3000); }
+    }
+  });
+  document.querySelectorAll('.tab').forEach(function (t) { t.onclick = function () { S.tab = t.dataset.tab; S.lb = -1; render(); }; });
+  $('#dkSend').onclick = function () { if (liveWrite()) confirmFinal(); else copyList(); };
+  $('#dkCopy').onclick = copyList;
+  $('#stCopy').onclick = copyList;
+  $('#stReopen').onclick = function () {
+    db.doc('meta/status').set({ state: 'open', note: S.status.note || '', at: Date.now() })
+      .then(function () { toast('Pilihan dibuka lagi untuk klien', 'ok'); })
+      .catch(function () { toast('Gagal membuka lagi.', 'warn'); });
+  };
+  $('#viewToggle').onclick = function () { S.preview = !S.preview; S.lb = -1; render(); };
+  $('#themeBtn').onclick = function () {
+    var r = document.documentElement;
+    var cur = r.dataset.theme || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+    r.dataset.theme = cur === 'dark' ? 'light' : 'dark';
+  };
+  $('#fileIn').addEventListener('change', function (e) { var f = e.target.files; if (f && f.length) addFiles(f); e.target.value = ''; });
+
+  var drag = function (e) { if (studio() && e.dataTransfer && Array.prototype.indexOf.call(e.dataTransfer.types || [], 'Files') >= 0) { e.preventDefault(); $('#empty').classList.add('drag'); } };
+  document.addEventListener('dragover', drag);
+  document.addEventListener('dragleave', function () { $('#empty').classList.remove('drag'); });
+  document.addEventListener('drop', function (e) { $('#empty').classList.remove('drag'); if (studio() && e.dataTransfer && e.dataTransfer.files.length) { e.preventDefault(); addFiles(e.dataTransfer.files); } });
+
+  var metaT, savedT;
+  function saveMeta() {
+    if (!db || !studio()) return;
+    clearTimeout(metaT);
+    metaT = setTimeout(function () {
+      var m = { title: $('#fTitle').value.trim(), client: $('#fClient').value.trim(), limit: Math.max(0, parseInt($('#fLimit').value, 10) || 0) };
+      db.doc('meta/gallery').set(m).then(function () {
+        $('#saved').textContent = 'Tersimpan'; clearTimeout(savedT); savedT = setTimeout(function () { $('#saved').textContent = ''; }, 2000);
+      }).catch(function () { toast('Pengaturan gagal disimpan.', 'warn'); });
+    }, 700);
+  }
+  ['#fTitle', '#fClient', '#fLimit'].forEach(function (s) { $(s).addEventListener('input', saveMeta); });
+
+  $('#lbClose').onclick = function () { S.lb = -1; renderLb(); };
+  $('#lbPrev').onclick = function () { var n = currentList().length; S.lb = (S.lb - 1 + n) % n; renderLb(); };
+  $('#lbNext').onclick = function () { var n = currentList().length; S.lb = (S.lb + 1) % n; renderLb(); };
+  $('#lbPick').onclick = function () { var p = currentList()[S.lb]; if (p) togglePick(p.id); };
+  var tx = 0, stage = $('#lbStage');
+  stage.addEventListener('touchstart', function (e) { tx = e.touches[0].clientX; }, { passive: true });
+  stage.addEventListener('touchend', function (e) {
+    var dx = e.changedTouches[0].clientX - tx;
+    if (Math.abs(dx) > 50) (dx > 0 ? $('#lbPrev') : $('#lbNext')).click();
+  }, { passive: true });
+  document.addEventListener('keydown', function (e) {
+    if (!$('#sheet').hidden) { if (e.key === 'Escape') closeSheet(); return; }
+    if (S.lb < 0) return;
+    if (e.key === 'Escape') $('#lbClose').click();
+    else if (e.key === 'ArrowLeft') $('#lbPrev').click();
+    else if (e.key === 'ArrowRight') $('#lbNext').click();
+  });
+
+  setInterval(function () { if (studio()) { renderLiveText(); if (S.status.state === 'final') renderPanel(); } }, 15000);
+
+  /* ---------- data ---------- */
+  function onErr(e) {
+    if (e && e.code === 'revoked') { S.noDb = true; }
+    else { S.loadErr = true; }
+    render();
+  }
+
+  async function init() {
+    render();
+    if (!window.claude || !window.claude.use) { S.noDb = true; render(); return; }
+    try { user = await claude.use('user'); } catch (e) { user = null; }
+    try { db = await claude.use('db'); } catch (e) { db = null; }
+    if (user) {
+      S.canEdit = !!(user.canEdit && user.canEdit());
+      var cw = user.can ? user.can('data.write') : null;
+      S.canWrite = (cw === null || cw === undefined) ? true : !!cw;
+    }
+    if (!db) { S.noDb = true; render(); return; }
+    if (S.canEdit) { try { assetsApi = await claude.use('assets'); } catch (e) { assetsApi = null; } }
+    render();
+
+    var loadT = setTimeout(function () { if (!S.connected) { S.loadErr = true; render(); } }, 10000);
+    var picksPrimed = false, statusPrimed = false;
+
+    db.collection('photos').orderBy('order').onSnapshot(function (snap) {
+      S.photos = snap.docs.map(function (d) { var x = d.data(); return { id: d.id, asset: x.asset, name: x.name || d.id, w: x.w || 0, h: x.h || 0, order: x.order || 0 }; });
+      if (!snap.metadata.fromCache) { S.connected = true; S.loadErr = false; clearTimeout(loadT); }
+      render();
+    }, onErr);
+
+    db.collection('picks').onSnapshot(function (snap) {
+      var live = !snap.metadata.fromCache && picksPrimed;
+      var m = new Map();
+      snap.docs.forEach(function (d) { m.set(d.id, d.data().picked === true); });
+      S.picks = m;
+      if (live && studio()) {
+        snap.docChanges().forEach(function (ch) {
+          if (ch.type === 'removed' || ch.doc.metadata.hasPendingWrites) return;
+          var p = S.photos.find(function (x) { return x.id === ch.doc.id; }); if (!p) return;
+          var on = ch.doc.data().picked === true;
+          if (ch.type === 'added' && !on) return;
+          note('Klien ' + (on ? 'memilih ' : 'membatalkan ') + p.name);
+        });
+      }
+      if (!snap.metadata.fromCache) picksPrimed = true;
+      render();
+    }, onErr);
+
+    db.doc('meta/gallery').onSnapshot(function (snap) {
+      var d = snap.exists ? snap.data() : {};
+      S.meta = { title: d.title || '', client: d.client || '', limit: Number(d.limit) || 0 };
+      render();
+    }, onErr);
+
+    db.doc('meta/status').onSnapshot(function (snap) {
+      var prev = S.status.state, d = snap.exists ? snap.data() : {};
+      S.status = { state: d.state === 'final' ? 'final' : 'open', note: d.note || '', at: d.at || 0 };
+      if (statusPrimed && studio() && prev !== 'final' && S.status.state === 'final' && !snap.metadata.hasPendingWrites) note('Klien mengirim pilihan final');
+      if (!snap.metadata.fromCache) statusPrimed = true;
+      render();
+    }, onErr);
+  }
+
+  init();
+})();
+</script>
+
+</body></html>
